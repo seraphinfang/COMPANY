@@ -22,6 +22,20 @@
     --font-scale: 1;
   }
 
+  :root.theme-light {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface2: #f0f0f3;
+    --border: #d6d6de;
+    --accent: #a17d00;
+    --accent2: #0a8c70;
+    --correct: #1f9658;
+    --wrong: #c83a3a;
+    --text: #1a1a22;
+    --text-dim: #4d4d5a;
+    --text-muted: #8a8a96;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -839,6 +853,7 @@
     <button class="mode-btn" id="modeMix" onclick="openMixSetup()" style="border-color:rgba(74,232,192,.4);color:var(--accent2)">🎲 混合測驗</button>
     <button class="mode-btn" id="modeHunt" onclick="openHunt()" style="border-color:rgba(240,96,90,.4);color:var(--wrong);font-weight:700">🎯 終極獵殺</button>
     <button class="mode-btn" id="fontSizeBtn" onclick="cycleFontSize()" style="border-color:var(--border);color:var(--text-dim)" title="點擊切換內文字型大小（1-5 階段）">Aa 1</button>
+    <button class="mode-btn" id="themeBtn" onclick="toggleTheme()" style="border-color:var(--border);color:var(--text-dim)" title="切換深色／淺色配色">🌙 深色</button>
   </div>
 </div>
 
@@ -1428,6 +1443,20 @@ function cycleFontSize() {
   applyFontScale(stage);
 }
 applyFontScale(localStorage.getItem('cg-font-stage') || '1');
+
+// ── 深淺色配色切換 ────────────────────────────────────────────
+function applyTheme(theme) {
+  const isLight = theme === 'light';
+  document.documentElement.classList.toggle('theme-light', isLight);
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = isLight ? '☀️ 淺色' : '🌙 深色';
+  localStorage.setItem('cg-theme', isLight ? 'light' : 'dark');
+}
+function toggleTheme() {
+  const cur = localStorage.getItem('cg-theme') || 'dark';
+  applyTheme(cur === 'light' ? 'dark' : 'light');
+}
+applyTheme(localStorage.getItem('cg-theme') || 'dark');
 
 // Init — 先用 localStorage 立刻 render，再 async 從雲端拉資料蓋上去
 async function bootApp() {
