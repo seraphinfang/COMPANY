@@ -827,18 +827,7 @@
 
 <div class="header">
   <h1>📋 公司治理刷題本</h1>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <div id="syncStatus" style="white-space:nowrap"><span style="color:var(--text-muted);font-family:monospace;font-size:12px">☁️ 未連線</span></div>
-    <button id="syncToggleBtn" class="mode-btn" onclick="toggleSync()" style="border-color:rgba(74,232,192,.3);color:var(--accent2)">☁️ 開啟同步</button>
-  </div>
-  <div id="deviceIdRow" style="display:none;align-items:center;gap:8px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--text-muted)">
-    <span>此裝置 ID：</span>
-    <span id="deviceIdText" style="font-family:monospace;color:var(--accent2);user-select:all"></span>
-    <button onclick="navigator.clipboard.writeText(document.getElementById('deviceIdText').textContent).then(()=>alert('已複製！'))" style="background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px">複製</button>
-    <span style="margin-left:8px">匯入其他裝置：</span>
-    <input id="importIdInput" placeholder="貼上另一台的 ID" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:3px 8px;border-radius:4px;font-size:11px;width:160px;font-family:monospace">
-    <button onclick="importDeviceId()" style="background:var(--accent2);border:none;color:#111;padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:700">匯入</button>
-  </div>
+  <div id="syncStatus" style="white-space:nowrap"><span style="color:var(--text-muted);font-family:monospace;font-size:12px">☁️ 連線中…</span></div>
   <div class="header-right">
     <button class="mode-btn active" id="modeAll" onclick="setMode('all')">全部題目</button>
     <button class="mode-btn" id="modeStar" onclick="setMode('starred')">⭐ 星號題</button>
@@ -1419,11 +1408,44 @@ function closeSidebarOnMobile() {
   }
 }
 
-// Init
-loadState().then(() => {
+// Init — 先用 localStorage 立刻 render，再 async 從雲端拉資料蓋上去
+async function bootApp() {
+  await loadState();
   state.currentChapter = -1;
   render();
-});
+  try {
+    await initFirebase();
+    currentUserId = 'main';
+    syncEnabled = true;
+    let doc = await db.collection('quiz_progress').doc('main').get();
+    if (!doc.exists) {
+      const legacyUid = localStorage.getItem('cg-uid');
+      if (legacyUid && legacyUid.startsWith('u_')) {
+        const legacyDoc = await db.collection('quiz_progress').doc(legacyUid).get();
+        if (legacyDoc.exists) {
+          await db.collection('quiz_progress').doc('main').set(legacyDoc.data());
+          doc = legacyDoc;
+        }
+      }
+    }
+    if (doc.exists) {
+      const d = doc.data();
+      state.answers     = d.answers     || {};
+      state.stars       = d.stars       || {};
+      huntData          = d.huntData    || {};
+      wrongDrillData    = d.wrongDrillData || {};
+      localStorage.setItem('cg-quiz-state', JSON.stringify({ answers: state.answers, stars: state.stars }));
+      localStorage.setItem('cg-hunt', JSON.stringify(huntData));
+      localStorage.setItem('cg-wrong-drill', JSON.stringify(wrongDrillData));
+      render();
+    }
+    updateSyncStatus('synced');
+  } catch(e) {
+    console.error('Auto-sync failed:', e);
+    updateSyncStatus('error');
+  }
+}
+bootApp();
 
 // ── Mix quiz ─────────────────────────────────────────────────────────
 let mixState = {
@@ -2316,7 +2338,7 @@ function getUserId() {
 
 // ── Cloud save (debounced 2s) ─────────────────────────────────────
 function cloudSave() {
-  if (!syncEnabled || !db) return;
+  if (!db) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(async () => {
     try {
