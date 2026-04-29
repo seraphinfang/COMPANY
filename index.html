@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>公司治理刷題</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0f0f13;
@@ -22,18 +22,19 @@
     --font-scale: 1;
   }
 
+  /* 淺色配色：抄 GitHub Primer Light（對比度高、學術感） */
   :root.theme-light {
-    --bg: #fafafa;
-    --surface: #ffffff;
-    --surface2: #f0f0f3;
-    --border: #d6d6de;
-    --accent: #a17d00;
-    --accent2: #0a8c70;
-    --correct: #1f9658;
-    --wrong: #c83a3a;
-    --text: #1a1a22;
-    --text-dim: #4d4d5a;
-    --text-muted: #8a8a96;
+    --bg: #ffffff;
+    --surface: #f6f8fa;
+    --surface2: #eaeef2;
+    --border: #d0d7de;
+    --accent: #9a3412;     /* 深橙金，對應原黃 */
+    --accent2: #0d7e6c;    /* 深青綠，對應原淺青 */
+    --correct: #1a7f37;    /* GitHub success */
+    --wrong: #cf222e;      /* GitHub danger */
+    --text: #1f2328;       /* 主字色，#000 太硬 */
+    --text-dim: #59636e;
+    --text-muted: #818b98;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,7 +42,7 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Noto Serif TC', serif;
+    font-family: 'Noto Sans TC', sans-serif;
     font-weight: 600;
     min-height: 100vh;
     display: flex;
