@@ -68,6 +68,13 @@
   .header-right {
     display: flex; gap: 12px; align-items: center;
   }
+  .header-settings {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-left: 14px;
+    border-left: 1px solid var(--border);
+  }
   .mode-btn {
     background: var(--surface2);
     border: 1px solid var(--border);
@@ -628,6 +635,17 @@
       grid-template-columns: 1fr 1fr 1fr;
       gap: 6px;
     }
+    .header-settings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+      padding-left: 0;
+      padding-top: 6px;
+      border-left: none;
+      border-top: 1px solid var(--border);
+    }
     .mode-btn {
       font-size: 11px;
       padding: 7px 4px;
@@ -846,13 +864,15 @@
 
 <div class="header">
   <h1>📋 公司治理刷題本</h1>
-  <div id="syncStatus" style="white-space:nowrap"><span style="color:var(--text-muted);font-family:monospace;font-size:12px">☁️ 連線中…</span></div>
   <div class="header-right">
     <button class="mode-btn active" id="modeAll" onclick="setMode('all')">全部題目</button>
     <button class="mode-btn" id="modeStar" onclick="setMode('starred')">⭐ 星號題</button>
     <button class="mode-btn" id="modeWrong" onclick="setMode('wrong')">❌ 錯誤題</button>
     <button class="mode-btn" id="modeMix" onclick="openMixSetup()" style="border-color:rgba(74,232,192,.4);color:var(--accent2)">🎲 混合測驗</button>
     <button class="mode-btn" id="modeHunt" onclick="openHunt()" style="border-color:rgba(240,96,90,.4);color:var(--wrong);font-weight:700">🎯 終極獵殺</button>
+  </div>
+  <div class="header-settings">
+    <div id="syncStatus" style="white-space:nowrap"><span style="color:var(--text-muted);font-family:monospace;font-size:12px">☁️ 連線中…</span></div>
     <button class="mode-btn" id="fontSizeBtn" onclick="cycleFontSize()" style="border-color:var(--border);color:var(--text-dim)" title="點擊切換內文字型大小（一到五級）">一級字</button>
     <button class="mode-btn" id="themeBtn" onclick="toggleTheme()" style="border-color:var(--border);color:var(--text-dim)" title="切換深色／淺色配色">🌙 深色</button>
   </div>
