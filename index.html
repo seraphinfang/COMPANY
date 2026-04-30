@@ -1076,8 +1076,8 @@ function resetAnswers() {
   saveState(); render();
 }
 function resetAll() {
-  if (!confirm('完全清除所有記錄（包含星號、錯題本、獵殺進度）？')) return;
-  state.answers = {}; state.stars = {};
+  if (!confirm('清除答題記錄、錯題本及獵殺進度？（星號收藏保留）')) return;
+  state.answers = {};
   wrongDrillData = {}; huntData = {};
   saveState(); saveWrongDrill(); saveHunt(); render();
 }
