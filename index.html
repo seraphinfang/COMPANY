@@ -1081,6 +1081,23 @@ function resetAll() {
   wrongDrillData = {}; huntData = {};
   saveState(); saveWrongDrill(); saveHunt(); render();
 }
+function resetChapter(origIdx) {
+  const ch = QUESTIONS[origIdx];
+  if (!ch) return;
+  const qCount = ch.questions.length;
+  let answered = 0;
+  for (let qi = 0; qi < qCount; qi++) if (state.answers[stateKey(origIdx, qi)]) answered++;
+  if (answered === 0) { alert(`「${ch.chapter}」沒有答題記錄可重設`); return; }
+  if (!confirm(`重設「${ch.chapter}」之答題記錄？\n\n已答 ${answered}/${qCount} 題之答案、星號、錯題本紀錄將清除；其他章節不受影響。`)) return;
+  for (let qi = 0; qi < qCount; qi++) {
+    const k = stateKey(origIdx, qi);
+    delete state.answers[k];
+    delete state.stars[k];
+    if (huntData) delete huntData[k];
+    if (wrongDrillData) delete wrongDrillData[k];
+  }
+  saveState(); saveHunt(); saveWrongDrill(); render();
+}
 
 // ── Drill mode ──────────────────────────────────────────────
 let drill = {
@@ -1303,7 +1320,8 @@ function renderQuestions() {
     chTitle.className = 'chapter-header';
     chTitle.innerHTML = `
       <div class="chapter-title">${chapter}</div>
-      <div class="chapter-stats">${questions.length} 題</div>`;
+      <div class="chapter-stats">${questions.length} 題</div>
+      <button onclick="resetChapter(${origIdx})" title="重設本章答題記錄" style="background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit;margin-left:8px">🔄 重設本章</button>`;
     area.appendChild(chTitle);
 
     // Progress
